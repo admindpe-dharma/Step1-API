@@ -10,7 +10,7 @@ import { config } from "dotenv";
 config();
 const app = express();
 const server = http.createServer(app);
-const port = 5010;
+const port = 5000;
  app.use(cors({
   origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods

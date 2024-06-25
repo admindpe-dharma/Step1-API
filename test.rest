@@ -1,0 +1,14 @@
+###
+POST  http://192.168.205.128:80/api/pid/pidatalog
+Content-Type: application/json
+
+{
+    "badgeno" : "123",
+    "logindate" :'',
+    "stationname" : "Coil",
+    "frombinname" : "1-PCL-1-WR",
+    "tobinname" : "PCS",
+    "weight" : "0.15",
+    "activity" : "Dispose"
+}
+

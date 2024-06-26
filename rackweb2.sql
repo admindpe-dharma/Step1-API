@@ -41,7 +41,7 @@ CREATE TABLE `bin` (
 
 LOCK TABLES `bin` WRITE;
 /*!40000 ALTER TABLE `bin` DISABLE KEYS */;
-INSERT INTO `bin` VALUES (1,'1-PCS-SR-5-1',0,1,'',5),(2,'1-PCS-SR-11-1',0,2,'',11),(3,'1-PCS-SR-3-2',0,3,'',3),(4,'1-PCL-7-6-1',0,1,'',0),(5,'1-PCL-SR-5-1',0,1,'PCS.local',5);
+INSERT INTO `bin` VALUES (1,'1-PCS-SR-5-1',0,1,'',5),(2,'1-PCS-SR-11-1',0,2,'',11),(3,'1-PCS-SR-3-2',0,3,'',3),(4,'1-PCL-7-6-1',0,1,'',0),(5,'1-PCL-SR-5-1',0,1,'2-PCL.local',5);
 /*!40000 ALTER TABLE `bin` ENABLE KEYS */;
 UNLOCK TABLES;
 

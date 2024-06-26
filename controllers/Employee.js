@@ -255,7 +255,7 @@ export const UpdateTransaksi = async (req,res)=>{
     }
     catch (err)
     {
-        return res.json({msg:err.response.data},500);
+        return res.json({msg: err.response ? err.response.data :  err},500);
     }
 }
 /*export const SaveTransaksiCollection = async (req, res) => {

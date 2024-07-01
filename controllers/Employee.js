@@ -15,7 +15,7 @@ import axios from "axios";
 const apiClient =  axios.create({
         proxy:{
             protocol:"http",
-            host : "",
+            host : "10.77.8.70",
             port:8080
         }
     });

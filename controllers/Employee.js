@@ -12,7 +12,13 @@ import { response } from "express";
 import axios from "axios";
 //import { updateBinWeightData } from "./Bin.js";
 
-
+const apiClient =  axios.create({
+        proxy:{
+            protocol:"http",
+            host : "",
+            port:8080
+        }
+    });
 export const ScanBadgeid = async (req, res) => {
     const { badgeId } = req.body;
     try {
@@ -217,7 +223,7 @@ export const SaveTransaksi = async (req, res) => {
     console.log(payload);
     try
     {
-    const _res =await  axios.post(`http://${process.env.STEP_2_TIMBANGAN}/Step1`,{
+    const _res =await  apiClient.post(`http://${process.env.STEP_2_TIMBANGAN}/Step1`,{
         idscraplog: payload.idscraplog,
         waste: _waste.name,
         container: _container.name,
@@ -247,7 +253,7 @@ export const UpdateTransaksi = async (req,res)=>{
         return res.json({msg:"Transaction Not Found"},404);
     try
     {
-        await axios.put(`http://${process.env.PIDSG}/api/pid/step1/`+ idscraplog,{status:"Done"});
+        await apiClient.put(`http://${process.env.PIDSG}/api/pid/step1/`+ idscraplog,{status:"Done"});
         _transaction.setDataValue("status",status);
         //_transaction.setDataValue("neto",neto);
         await _transaction.save();

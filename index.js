@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import bodyParser from "body-parser";
 import { UpdateStatus } from "./controllers/Employee.js";
 import { config } from "dotenv";
+import path from "path";
 config();
 const app = express();
 const server = http.createServer(app);
@@ -24,7 +25,10 @@ const io = new Server(server, {
     origin: "*"
   }
 });
-
+app.use(express.static('client/build'));
+/*app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });*/
 app.use(bodyParser.json());
 
 try {

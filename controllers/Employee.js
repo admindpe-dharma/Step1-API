@@ -217,7 +217,7 @@ export const SaveTransaksi = async (req, res) => {
     console.log(payload);
     try
     {
-    const _res =await  axios.post(`http://${process.env.STEP_2_TIMBANGAN}/Step1`,{
+/*    const _res =await  axios.post(`http://${process.env.STEP_2_TIMBANGAN}/Step1`,{
         idscraplog: payload.idscraplog,
         waste: _waste.name,
         container: _container.name,
@@ -225,7 +225,7 @@ export const SaveTransaksi = async (req, res) => {
         toBin: payload.bin
     });
     if (_res.status!=200)
-        return res.status(500).json({msg:_res.data});
+        return res.status(500).json({msg:_res.data});*/
     (await transaction.create(payload)).save();
     return res.status(200).json({ msg: 'ok' });
     }

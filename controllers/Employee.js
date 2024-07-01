@@ -223,7 +223,7 @@ export const SaveTransaksi = async (req, res) => {
     console.log(payload);
     try
     {
-    const _res =await  apiClient.post(`http://${process.env.STEP_2_TIMBANGAN}/Step1`,{
+    const _res =await  apiClient.post(`http://2-PCL.local/Step1`,{
         idscraplog: payload.idscraplog,
         waste: _waste.name,
         container: _container.name,

@@ -206,7 +206,20 @@ export const CheckBinCapacity = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
-
+export const checkTransaksi = async (req,res) =>{
+    const {idContainer,bin_qr,bin } = req.query;
+    
+    const tr = await transaction.findOne({
+        where:{
+            idContainer: idContainer,
+            bin_qr: bin_qr,
+            bin: bin,
+            status: "Waiting Dispose To Step 2"
+        }
+    });
+    console.log([payload,tr]);
+    return tr ?  res.status(409).json({msg:"Transaction Already Registered"}) :res.status(200).json({msg:"OK"});
+}
 export const SaveTransaksi = async (req, res) => {
     const { payload } = req.body;
     //payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");

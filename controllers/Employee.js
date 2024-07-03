@@ -217,7 +217,7 @@ export const checkTransaksi = async (req,res) =>{
             status: "Waiting Dispose To Step 2"
         }
     });
-    console.log([payload,tr]);
+    console.log([idContainer,bin_qr,bin,tr]);
     return tr ?  res.status(409).json({msg:"Transaction Already Registered"}) :res.status(200).json({msg:"OK"});
 }
 export const SaveTransaksi = async (req, res) => {

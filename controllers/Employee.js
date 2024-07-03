@@ -224,7 +224,8 @@ export const SaveTransaksi = async (req, res) => {
         where:{
             idContainer: payload.idContainer,
             bin_qr: payload.bin_qr,
-            bin: payload.bin
+            bin: payload.bin,
+            status: "Waiting Dispose To Step 2"
         }
     });
     console.log(payload);

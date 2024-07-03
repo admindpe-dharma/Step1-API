@@ -220,6 +220,16 @@ export const SaveTransaksi = async (req, res) => {
             containerId: payload.idContainer
         }
     });
+    const tr = await transaction.findOne({
+        where:{
+            idContainer: payload.idContainer,
+            bin_qr: payload.bin_qr,
+            bin: payload.bin
+        }
+    });
+    console.log(payload);
+    if (tr)
+        return res.status(409).json({msg:"Transaction Already Registered"});
     console.log([`${process.env.STEP_2_TIMBANGAN}`,payload]);
     try
     {

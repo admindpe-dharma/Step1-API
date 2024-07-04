@@ -54,7 +54,8 @@ export const ScanContainer = async (req, res) => {
                             required: true,
                             duplicating: true,
                             foreignKey: 'name',
-                            attributes: ['name', 'id', 'IdWaste', 'name_hostname', 'weight']
+                            attributes: ['name', 'id', 'IdWaste', 'name_hostname', 'weight'],
+                            required: false
                         }
                     ]
                 }

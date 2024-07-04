@@ -51,8 +51,6 @@ export const ScanContainer = async (req, res) => {
                         {
                             model: Bin,
                             as: 'bin',
-                            required: true,
-                            duplicating: true,
                             foreignKey: 'name',
                             attributes: ['name', 'id', 'IdWaste', 'name_hostname', 'weight'],
                             required: false

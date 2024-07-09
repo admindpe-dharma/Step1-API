@@ -47,7 +47,7 @@ export const ScanContainer = async (req, res) => {
                     duplicating: true,
                     foreignKey: 'IdWaste',
                     attributes: ['name', 'scales'],
-            include: [
+                    include: [
                         {
                             model: Bin,
                             as: 'bin',
@@ -246,7 +246,8 @@ export const SaveTransaksi = async (req, res) => {
         return res.status(409).json({msg:"Transaction Already Registered"});
     try
     {
-    const _res =await  apiClient.post(`http://${_container.station}.local/Step1`,{
+    console.log(_container.hostname);
+    const _res =await  apiClient.post(`http://${_container.hostname}.local/Step1`,{
         idscraplog: payload.idscraplog,
         waste: _waste.name,
         container: _container.name,

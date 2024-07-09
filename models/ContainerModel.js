@@ -19,6 +19,9 @@ const container = db.define('container', {
     line: {
         type: DataTypes.INTEGER,
     },
+    hostname: {
+        type: DataTypes.STRING
+    }
 }, {
     freezeTableName: true,
     timestamps:false

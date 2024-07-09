@@ -38,7 +38,7 @@ export const ScanContainer = async (req, res) => {
     const { containerId } = req.body;
     try {
         const container = await Container.findOne({
-            attributes: ['containerId', 'name', 'station', 'weightbin', 'IdWaste', 'type', 'line'],
+            attributes: ['containerId', 'name', 'station', 'weightbin', 'IdWaste', 'type', 'line','hostname'],
             include: [
                 {
                     model: Waste,
@@ -247,7 +247,7 @@ export const SaveTransaksi = async (req, res) => {
     try
     {
     console.log(_container.hostname);
-    const _res =await  apiClient.post(`http://${_container.hostname}.local/Step1`,{
+    const _res =await  apiClient.post(`http://${_container.hostname}/Step1`,{
         idscraplog: payload.idscraplog,
         waste: _waste.name,
         container: _container.name,

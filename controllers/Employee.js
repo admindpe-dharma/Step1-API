@@ -134,7 +134,8 @@ export const getTransactionList = async (req, res) => {
                 duplicating: true,
                 foreignKey: 'badgeId',
                 attributes: ['username']
-            }]
+            }],
+            order:[['createdAt','DESC']]
         });
 
         // Format createdAt to 'yyyy-mm-dd'
@@ -243,10 +244,9 @@ export const SaveTransaksi = async (req, res) => {
     console.log(payload);
     if (tr)
         return res.status(409).json({msg:"Transaction Already Registered"});
-    console.log([`${process.env.STEP_2_TIMBANGAN}`,payload]);
     try
     {
-    const _res =await  apiClient.post(`http://${process.env.STEP_2_TIMBANGAN}/Step1`,{
+    const _res =await  apiClient.post(`http://${_container.station}.local/Step1`,{
         idscraplog: payload.idscraplog,
         waste: _waste.name,
         container: _container.name,

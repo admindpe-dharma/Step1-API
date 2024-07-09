@@ -10,14 +10,15 @@ const container = db.define('container', {
         allowNull: false,
         primaryKey:true
     },
+    station:{
+        type: DataTypes.STRING
+    },
     name: {
         type: DataTypes.STRING,
     },
     line: {
         type: DataTypes.INTEGER,
     },
-    
-
 }, {
     freezeTableName: true,
     timestamps:false

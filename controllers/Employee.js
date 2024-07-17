@@ -137,7 +137,7 @@ export const syncTransaction = async (req, res)=>{
                 }
             }
         });
-        return res.status(200).json(dataTransaction);
+        return res.status(200).json(dataTransaction ?? []);
     }
     catch (err)
     {

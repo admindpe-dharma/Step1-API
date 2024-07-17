@@ -10,6 +10,8 @@ import bin from "../models/BinModel.js";
 import {io} from '../index.js';
 import { response } from "express";
 import axios from "axios";
+import { Op } from "sequelize";
+import waste from "../models/WasteModel.js";
 //import { updateBinWeightData } from "./Bin.js";
 
 const apiClient =  axios.create({
@@ -107,7 +109,42 @@ export const ScanMachine = async (req, res) => {
         res.status(500).json({ msg: 'Terjadi kesalahan server' });
     }
 };
-
+export const syncTransaction = async (req, res)=>{
+    try
+    {
+        const dataTransaction = await transaction.findAll({
+            include:[
+                {
+                    model:container,
+                    as:'container',
+                    required:true,
+                    foreignKey:'idContainer',
+                    where:{
+                        hostname: req.params.hostname
+                    }
+                },
+                {
+                    model:waste,
+                    as:"waste",
+                    foreignKey:"IdWaste",
+                    required:true,
+                }
+            ],
+            where:{
+                status:'Waiting Dispose To Step 2',
+                [Op.ne]:{
+                    idscraplog: 'Fail'
+                }
+            }
+        });
+        return res.status(200).json(dataTransaction);
+    }
+    catch (err)
+    {
+        
+        res.status(500).json({ msg: error});
+    }
+}
 export const getTransactionList = async (req, res) => {
     try {
         let response = await transaction.findAll({
@@ -217,7 +254,6 @@ export const checkTransaksi = async (req,res) =>{
             status: "Waiting Dispose To Step 2"
         }
     });
-    console.log([idContainer,bin_qr,bin,tr]);
     return tr ?  res.status(409).json({msg:"Transaction Already Registered"}) :res.status(200).json({msg:"OK"});
 }
 export const SaveTransaksi = async (req, res) => {

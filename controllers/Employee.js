@@ -172,7 +172,12 @@ export const getTransactionList = async (req, res) => {
                 foreignKey: 'badgeId',
                 attributes: ['username']
             }],
-            order:[['createdAt','DESC']]
+            order:[['createdAt','DESC']],
+            where:{
+                [Op.ne]: {
+                    idscraplog : "Fail"
+                }
+            }
         });
 
         // Format createdAt to 'yyyy-mm-dd'

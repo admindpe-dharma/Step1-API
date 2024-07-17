@@ -132,8 +132,8 @@ export const syncTransaction = async (req, res)=>{
             ],
             where:{
                 status:'Waiting Dispose To Step 2',
-                [Op.ne]:{
-                    idscraplog: 'Fail'
+                idscraplog:{
+                    [Op.ne]: 'Fail'
                 }
             }
         });
@@ -174,8 +174,8 @@ export const getTransactionList = async (req, res) => {
             }],
             order:[['createdAt','DESC']],
             where:{
-                [Op.ne]: {
-                    idscraplog : "Fail"
+                idscraplog: {
+                    [Op.ne] : "Fail"
                 }
             }
         });

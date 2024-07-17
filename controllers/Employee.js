@@ -120,7 +120,9 @@ export const syncTransaction = async (req, res)=>{
                     required:true,
                     foreignKey:'idContainer',
                     where:{
-                        hostname: req.params.hostname
+                        station: {
+                            [Op.like] : '%'+req.params.hostname+'%'
+                        }
                     }
                 },
                 {

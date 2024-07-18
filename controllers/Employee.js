@@ -99,7 +99,6 @@ export const ScanMachine = async (req, res) => {
         });
 
         if (machine) {
-            console.log(machine);
             res.json({ machine: machine });
         } else {
             res.json({ error: 'bin ID not found' });
@@ -216,7 +215,6 @@ export const VerificationScan = async (req, res) => {
 
 export const CheckBinCapacity = async (req, res) => {
     const { IdWaste, neto } = req.body;
-    console.log(IdWaste);
     try {
         // Mengambil semua tempat sampah yang sesuai dengan type_waste dari database
         const bins = await Bin.findAll({
@@ -284,12 +282,10 @@ export const SaveTransaksi = async (req, res) => {
             status: "Waiting Dispose To Step 2"
         }
     });
-    console.log(payload);
     if (tr)
         return res.status(409).json({msg:"Transaction Already Registered"});
     try
     {
-    console.log(_container.hostname);
     const _res =await  apiClient.post(`http://${_container.hostname}/Step1`,{
         idscraplog: payload.idscraplog,
         waste: _waste.name,
@@ -304,7 +300,6 @@ export const SaveTransaksi = async (req, res) => {
     }
     catch (err)
     {
-        console.log(err.response ? err.response.data : err);
         return res.status(500).json(err.response ? err.response.data : err);
     }
 };
@@ -334,7 +329,6 @@ export const UpdateTransaksi = async (req,res)=>{
 /*export const SaveTransaksiCollection = async (req, res) => {
     const { payload } = req.body;
     payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
-    console.log(payload);
     (await transaction.create(payload)).save();
     res.status(200).json({ msg: 'ok' });
 };*/
@@ -367,7 +361,6 @@ export const UpdateBinWeightCollection = async (req, res) => {
 export const UpdateDataFromStep2 = async (req, res) => {
     try {
         const { idContainer, status } = req.body;
-        console.log([idContainer, status]);
         if (!idContainer || !status) {
             return res.status(400).json({ msg: "Name dan status harus disertakan" });
         }
@@ -398,7 +391,6 @@ export const UpdateDataFromStep2 = async (req, res) => {
 export const UpdateLineContainer = async (req, res) => {
     try {
         const { name, line } = req.body;
-        //console.log([idContainer, status]);
         if (!name || !line) {
             return res.status(400).json({ msg: "Name dan status harus disertakan" });
         }
@@ -428,13 +420,11 @@ export const UpdateLineContainer = async (req, res) => {
 
 export const UpdateStatus = async (req,res) => {
     const {containerName,status,binQr} = req.body;   
-    console.log([containerName,status,binQr]);
     const data = await  Container.findOne(
         { where :{
             name:containerName
         }
     });
-    console.log(data.containerId);
      await transaction.update({status:status},{
         where:{
             idContainer: data.containerId,

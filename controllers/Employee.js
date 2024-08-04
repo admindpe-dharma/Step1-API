@@ -304,7 +304,7 @@ export const SaveTransaksi = async (req, res) => {
     }
 };
 export const UpdateTransaksi = async (req,res)=>{
-    const {idscraplog} = req.params;
+    const {idscraplog,logindate} = req.params;
     const {status} = req.body;
     const _transaction = await transaction.findOne({
         where:{
@@ -315,7 +315,7 @@ export const UpdateTransaksi = async (req,res)=>{
         return res.json({msg:"Transaction Not Found"},404);
     try
     {
-        await apiClient.put(`http://${process.env.PIDSG}/api/pid/step1/`+ idscraplog,{status:"Done"});
+        await apiClient.put(`http://${process.env.PIDSG}/api/pid/step1/`+ idscraplog,{status:"Done",logindate:logindate});
         _transaction.setDataValue("status",status);
         //_transaction.setDataValue("neto",neto);
         await _transaction.save();

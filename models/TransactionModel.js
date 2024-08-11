@@ -38,6 +38,10 @@ const transaction = db.define('transaction', {
         type: DataTypes.STRING,
         allowNull: true  
     },
+    createdAt:{
+        type:DataTypes.DATE,
+        allowNull:true
+    }
 }, {
     freezeTableName: true,
     timestamps:false,

@@ -180,7 +180,6 @@ export const getTransactionList = async (req, res) => {
                 }
             }
         });
-
         // Format createdAt to 'yyyy-mm-dd'
         response = response.map(transaction => {
             return {

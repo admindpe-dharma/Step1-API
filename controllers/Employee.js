@@ -294,14 +294,25 @@ export const SaveTransaksi = async (req, res) => {
     });
     if (_res.status!=200)
         return res.status(500).json({msg:_res.data});
-    (await transaction.create(payload)).save();
-    return res.status(200).json({ msg: 'ok' });
+    const latest = await transaction.create(payload);
+    latest.save();
+    return res.status(200).json({ Id: latest.dataValues.Id ?? latest.dataValues.id });
     }
     catch (err)
     {
         return res.status(500).json(err.response ? err.response.data : err);
     }
 };
+export const DeleteTransaksi = async (req,res)=>{
+    const {id} = req.params.id;
+    const dataTransaction = await transaction.findOne({where:{
+        Id: id
+    }});
+    if (!dataTransaction)
+        return res.status(201).json({msg:'Data Not Found, No Issue'});
+    dataTransaction.destroy();
+    return res.status(200).json({msg:"ok"});
+}
 export const UpdateTransaksi = async (req,res)=>{
     const {idscraplog,logindate} = req.params;
     const {status} = req.body;

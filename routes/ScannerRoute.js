@@ -1,6 +1,6 @@
 
 import express from "express";
-import {ScanBadgeid,ScanContainer,CheckBinCapacity,SaveTransaksi,UpdateBinWeight,UpdateBinWeightCollection,VerificationScan,getTransactionList,UpdateDataFromStep2,ScanMachine,UpdateLineContainer, UpdateStatus,getIdscaplog, getIdmachine, UpdateTransaksi, checkTransaksi, syncTransaction} from "../controllers/Employee.js"
+import {ScanBadgeid,ScanContainer,CheckBinCapacity,SaveTransaksi,UpdateBinWeight,UpdateBinWeightCollection,VerificationScan,getTransactionList,UpdateDataFromStep2,ScanMachine,UpdateLineContainer, UpdateStatus,getIdscaplog, getIdmachine, UpdateTransaksi, checkTransaksi, syncTransaction, DeleteTransaksi} from "../controllers/Employee.js"
 //import {getbinData} from "../controllers/Bin.js"
 
 const router = express.Router();
@@ -23,4 +23,5 @@ router.post('/Getidmachine',getIdmachine);
 router.put("/step1/:idscraplog",UpdateTransaksi);
 router.get("/CekTransaksi",checkTransaksi);
 router.get('/sync/:hostname',syncTransaction);
+router.delete('/CancelTransaksi/:id',DeleteTransaksi);
 export default router;

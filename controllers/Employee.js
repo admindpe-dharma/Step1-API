@@ -31,8 +31,8 @@ export const ScanBadgeid = async (req, res) => {
             res.json({ error: 'Badge ID not found' });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: 'Terjadi kesalahan server' });
+        console.log(error);
+        res.status(500).json({ error: 'Terjadi kesalahan server' });
     }
 };
 
@@ -69,14 +69,24 @@ export const ScanContainer = async (req, res) => {
             res.json({ error: 'Container ID not found' });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: 'Terjadi kesalahan server' });
+        console.log(error);
+        res.status(500).json({ error: 'Terjadi kesalahan server' });
     }
 };
 
 export const ScanMachine = async (req, res) => {
     const { machineId } = req.body;
     try {
+            
+        const tr = await transaction.findOne({
+            where:{
+                bin_qr: machineId,
+                bin: machineId,
+                status: "Waiting Dispose To Step 2"
+            }
+        });
+        if (tr)
+            return res.status(409).json({error:"Id have already been used"});
         const machine = await Bin.findOne({
             attributes: ['id', 'name','IdWaste','line'],
             include: [{
@@ -104,8 +114,8 @@ export const ScanMachine = async (req, res) => {
             res.json({ error: 'bin ID not found' });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: 'Terjadi kesalahan server' });
+        console.log(error);
+        res.status(500).json({ error: 'Terjadi kesalahan server' });
     }
 };
 export const syncTransaction = async (req, res)=>{
@@ -143,7 +153,7 @@ export const syncTransaction = async (req, res)=>{
     catch (err)
     {
         
-        res.status(500).json({ msg: error});
+        res.status(500).json({ error: err});
     }
 }
 export const getTransactionList = async (req, res) => {
@@ -190,7 +200,7 @@ export const getTransactionList = async (req, res) => {
 
         res.status(200).json(response);
     } catch (error) {
-        res.status(500).json({ msg: error.message });
+        res.status(500).json({ error: error.message });
     }
 }
 
@@ -207,8 +217,8 @@ export const VerificationScan = async (req, res) => {
             res.json({ error: 'Container ID not found' });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: 'Terjadi kesalahan server' });
+        console.log(error);
+        res.status(500).json({ error: 'Terjadi kesalahan server' });
     }
 };
 
@@ -243,8 +253,8 @@ export const CheckBinCapacity = async (req, res) => {
 
         res.status(200).json({ success: true, bin: selectedBin });
     } catch (error) {
-        console.error('Error checking bin capacity:', error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
+        console.log('Error checking bin capacity:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 };
 export const checkTransaksi = async (req,res) =>{
@@ -252,7 +262,6 @@ export const checkTransaksi = async (req,res) =>{
     
     const tr = await transaction.findOne({
         where:{
-            idContainer: idContainer,
             bin_qr: bin_qr,
             bin: bin,
             status: "Waiting Dispose To Step 2"
@@ -275,7 +284,6 @@ export const SaveTransaksi = async (req, res) => {
     });
     const tr = await transaction.findOne({
         where:{
-            idContainer: payload.idContainer,
             bin_qr: payload.bin_qr,
             bin: payload.bin,
             status: "Waiting Dispose To Step 2"
@@ -300,7 +308,7 @@ export const SaveTransaksi = async (req, res) => {
     }
     catch (err)
     {
-        return res.status(500).json(err.response ? err.response.data : err);
+        return res.status(500).json({error : (err.response ? err.response.data : err)});
     }
 };
 export const DeleteTransaksi = async (req,res)=>{
@@ -333,7 +341,7 @@ export const UpdateTransaksi = async (req,res)=>{
     }
     catch (err)
     {
-        return res.json({msg: err.response ? err.response.data :  err},500);
+        return res.json({error: err.response ? err.response.data :  err},500);
     }
 }
 /*export const SaveTransaksiCollection = async (req, res) => {
@@ -394,7 +402,7 @@ export const UpdateDataFromStep2 = async (req, res) => {
 
         res.status(200).json({ msg: "Status berhasil diperbarui" });
     } catch (error) {
-        res.status(500).json({ msg: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -424,7 +432,7 @@ export const UpdateLineContainer = async (req, res) => {
 
         res.status(200).json({ msg: "line berhasil diperbarui" });
     } catch (error) {
-        res.status(500).json({ msg: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -471,7 +479,7 @@ export const getIdscaplog = async (req, res) => {
 
         res.status(200).json({ msg: "get data berhasil", data: transactionRecord });
     } catch (error) {
-        res.status(500).json({ msg: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -502,7 +510,7 @@ export const getIdmachine = async (req, res) => {
 
         res.status(200).json({ msg: "get data berhasil", data: transactionRecord });
     } catch (error) {
-        res.status(500).json({ msg: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 

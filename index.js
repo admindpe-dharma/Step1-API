@@ -36,7 +36,7 @@ try {
   console.log('Database terhubung..');
   
 } catch (error) {
-  console.error(error);
+  console.log(error);
   
 }
 app.use(ScannerRoute);

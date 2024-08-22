@@ -39,6 +39,8 @@ export const ScanBadgeid = async (req, res) => {
 export const ScanContainer = async (req, res) => {
     const { containerId } = req.body;
     try {
+        
+
         const container = await Container.findOne({
             attributes: ['containerId', 'name', 'station', 'weightbin', 'IdWaste', 'type', 'line','hostname'],
             include: [
@@ -62,7 +64,14 @@ export const ScanContainer = async (req, res) => {
             ],
             where: { name: containerId }
         });
-
+        const tr = await transaction.findOne({
+            where:{
+                idContainer: container.containerId,
+                status: "Waiting Dispose To Step 2"
+            }
+        });
+        if (tr)
+            return res.status(409).json({error:"Id have already been used"});
         if (container) {
             res.json({ container: container });
         } else {
@@ -77,16 +86,6 @@ export const ScanContainer = async (req, res) => {
 export const ScanMachine = async (req, res) => {
     const { machineId } = req.body;
     try {
-            
-        const tr = await transaction.findOne({
-            where:{
-                bin_qr: machineId,
-                bin: machineId,
-                status: "Waiting Dispose To Step 2"
-            }
-        });
-        if (tr)
-            return res.status(409).json({error:"Id have already been used"});
         const machine = await Bin.findOne({
             attributes: ['id', 'name','IdWaste','line'],
             include: [{
@@ -262,8 +261,7 @@ export const checkTransaksi = async (req,res) =>{
     
     const tr = await transaction.findOne({
         where:{
-            bin_qr: bin_qr,
-            bin: bin,
+            idContainer: idContainer,
             status: "Waiting Dispose To Step 2"
         }
     });
@@ -284,8 +282,7 @@ export const SaveTransaksi = async (req, res) => {
     });
     const tr = await transaction.findOne({
         where:{
-            bin_qr: payload.bin_qr,
-            bin: payload.bin,
+            idContainer: payload.idContainer,
             status: "Waiting Dispose To Step 2"
         }
     });

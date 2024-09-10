@@ -300,7 +300,7 @@ export const SaveTransaksi = async (req, res) => {
     if (_res.status!=200)
         return res.status(500).json({msg:_res.data});
     const latest = await transaction.create(payload);
-    latest.save();
+    await latest.save();
     return res.status(200).json({ Id: latest.dataValues.Id ?? latest.dataValues.id });
     }
     catch (err)

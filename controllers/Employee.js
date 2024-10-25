@@ -10,8 +10,9 @@ import bin from "../models/BinModel.js";
 import {io} from '../index.js';
 import { response } from "express";
 import axios from "axios";
-import { Op } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 import waste from "../models/WasteModel.js";
+import db from "../config/db.js";
 //import { updateBinWeightData } from "./Bin.js";
 
 const apiClient =  axios.create({
@@ -21,6 +22,12 @@ const apiClient =  axios.create({
             port:8080
         }
     });
+const syncApiClient = axios.create({
+
+    
+});
+syncApiClient.interceptors.response.use((res)=>res,
+(err)=>err);
 export const ScanBadgeid = async (req, res) => {
     const { badgeId } = req.body;
     try {
@@ -117,6 +124,78 @@ export const ScanMachine = async (req, res) => {
         res.status(500).json({ error: 'Terjadi kesalahan server' });
     }
 };
+export const syncPendingTransaction = async ()=>{
+    const pendingData = await db.query("Select t.Id,t.badgeId,c.name as containerName,c.hostname,w.name as wasteName,status,bin_qr,idscraplog,bin from transaction t inner join container c on t.idContainer=c.containerId inner join waste w on w.Id=t.IdWaste where t.status like '%PENDING%';",{type:QueryTypes.SELECT});
+    if (pendingData.length<1)
+        return pendingData;
+    for (let i=0;i<pendingData.length;i++)
+    {
+        const error = pendingData[i].status.split('|');
+        error.splice(0,1);
+        const errorLoop = [...error];
+        for (let j=0;j<errorLoop.length;j++)
+        {
+            if (errorLoop[j] == 'PIDSG')
+            {
+                
+                const stationname = pendingData[i].containerName.split("-").slice(0, 3).join("-");
+                const result = await syncApiClient.post(
+                    `http://${process.env.PIDSG}/api/pid/step1`,
+                    {
+                      badgeno: pendingData[i].badgeId,
+                      logindate: "",
+                      stationname: stationname,
+                      frombinname: pendingData[i].bin_qr,
+                      tobinname: pendingData[i].containerName,
+                      weight: "0",
+                      activity: "Waiting Dispose To Step 2",
+                    },
+                    {
+                        validateStatus: (status)=>true,
+                        timeout:1000,
+                        withCredentials:false
+                    }
+                );
+                if (result.status && result.status==200 && result.data.result && result.data.result != 'Fail' && result.data.result != null)
+                {
+                    const index = error.indexOf("PIDSG");
+                    if (index > -1)
+                    {
+                        error.splice(index,1);
+                        pendingData[i].idscraplog = result.data.result;
+                    }
+                } 
+                continue;
+            }
+            else if (errorLoop[j] == "STEP2" && !error.includes("PIDSG") && pendingData[i].idscraplog  && pendingData[i].idscraplog != 'Fail' && pendingData[i].idscraplog != '')
+            {
+                const resStep2 = await  syncApiClient.post(`http://${pendingData[i].hostname}/Step1`,{
+                    idscraplog: pendingData[i].idscraplog,
+                    waste: pendingData[i].wasteName,
+                    container: pendingData[i].containerName,
+                    badgeId: pendingData[i].badgeId,
+                    toBin: pendingData[i].bin
+                },{
+                    timeout:2000,
+                    withCredentials:false,
+                    validateStatus: (status)=>true
+                });
+                if (resStep2.status && resStep2.status==200)
+                {
+                    const index = error.indexOf("STEP2");
+                    error.splice(index,1);
+                }
+                continue;
+            }
+        }
+        const newStatus = error.length  > 0 ? ["PENDING",...error] : ["Waiting Dispose To Step 2"];
+        pendingData[i].status = newStatus.join("|");
+        await db.query("Update Transaction set status=:newStatus where id=:id",{
+            type: QueryTypes.UPDATE,
+            replacements: {newStatus:newStatus.join("|"),id: pendingData[i].Id}
+        });
+    }
+}
 export const syncTransaction = async (req, res)=>{
     try
     {
@@ -268,7 +347,7 @@ export const checkTransaksi = async (req,res) =>{
     return tr ?  res.status(409).json({msg:"Transaction Already Registered"}) :res.status(200).json({msg:"OK"});
 }
 export const SaveTransaksi = async (req, res) => {
-    const { payload } = req.body;
+    const { payload ,error} = req.body;
     //payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
     const _waste = await Waste.findOne({
         where: {
@@ -300,9 +379,9 @@ export const SaveTransaksi = async (req, res) => {
         validateStatus: (status)=>true
     });
     if (_res.status>= 300)
-    {
-        payload.status = payload.status.includes("PENDING") ? payload.status + "|STEP2" : "PENDING|STEP2";
-    }
+        error.push('STEP2');
+    if (error && error.length > 0)
+        payload.status = ["PENDING",...error].join("|");
     const latest = await transaction.create(payload);
     await latest.save();
     return res.status(200).json({ Id: latest.dataValues.Id ?? latest.dataValues.id });

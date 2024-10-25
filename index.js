@@ -5,10 +5,10 @@ import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
 import bodyParser from "body-parser";
-import { UpdateStatus } from "./controllers/Employee.js";
+import { syncPendingTransaction, UpdateStatus } from "./controllers/Employee.js";
 import { config } from "dotenv";
 import path from "path";
-config();
+config('.env');
 const app = express();
 const server = http.createServer(app);
 const port = 5000;
@@ -44,5 +44,9 @@ app.use(ScannerRoute);
 server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
-
+const syncWork = async ()=>{
+  await syncPendingTransaction();
+  setImmediate(syncWork);
+};
+syncWork();
 export {io};

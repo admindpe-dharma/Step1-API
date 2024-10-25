@@ -296,9 +296,13 @@ export const SaveTransaksi = async (req, res) => {
         container: _container.name,
         badgeId: payload.badgeId,
         toBin: payload.bin
+    },{
+        validateStatus: (status)=>true
     });
-    if (_res.status!=200)
-        return res.status(500).json({msg:_res.data});
+    if (_res.status>= 300)
+    {
+        payload.status = payload.status.includes("PENDING") ? payload.status + "|STEP2" : "PENDING|STEP2";
+    }
     const latest = await transaction.create(payload);
     await latest.save();
     return res.status(200).json({ Id: latest.dataValues.Id ?? latest.dataValues.id });

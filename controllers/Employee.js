@@ -221,10 +221,17 @@ export const syncPendingTransaction = async () => {
     const newStatus =
       error.length > 0 ? ["PENDING", ...error] : ["Waiting Dispose To Step 2"];
     pendingData[i].status = newStatus.join("|");
-    await db.query("Update Transaction set status=:newStatus where id=:id", {
-      type: QueryTypes.UPDATE,
-      replacements: { newStatus: newStatus.join("|"), id: pendingData[i].Id },
-    });
+    await db.query(
+      "Update Transaction set status=:newStatus,idscraplog=:idscraplog where id=:id",
+      {
+        type: QueryTypes.UPDATE,
+        replacements: {
+          newStatus: newStatus.join("|"),
+          id: pendingData[i].Id,
+          idscraplog: pendingData[i].idscraplog,
+        },
+      }
+    );
   }
 };
 export const syncTransaction = async (req, res) => {

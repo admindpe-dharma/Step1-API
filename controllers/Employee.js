@@ -150,7 +150,6 @@ export const syncPendingTransaction = async () => {
     const error = pendingData[i].status.split("|");
     error.splice(0, 1);
     const errorLoop = [...error];
-    console.log([errorLoop, pendingData[i]]);
     for (let j = 0; j < errorLoop.length; j++) {
       if (errorLoop[j] == "PIDSG") {
         const stationname = pendingData[i].containerName
@@ -210,7 +209,6 @@ export const syncPendingTransaction = async () => {
             validateStatus: (status) => true,
           }
         );
-        console.log(resStep2);
         if (resStep2.status && resStep2.status == 200) {
           const index = error.indexOf("STEP2");
           error.splice(index, 1);

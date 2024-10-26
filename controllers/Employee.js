@@ -150,7 +150,7 @@ export const syncPendingTransaction = async () => {
     const error = pendingData[i].status.split("|");
     error.splice(0, 1);
     const errorLoop = [...error];
-    console.log(errorLoop);
+    console.log([errorLoop, pendingData[i]]);
     for (let j = 0; j < errorLoop.length; j++) {
       if (errorLoop[j] == "PIDSG") {
         const stationname = pendingData[i].containerName

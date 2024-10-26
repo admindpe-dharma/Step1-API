@@ -315,6 +315,9 @@ export const getTransactionList = async (req, res) => {
     response = response.map((transaction) => {
       return {
         ...transaction.dataValues,
+        status: transaction.dataValues.status.includes("PENDING")
+          ? "PENDING"
+          : transaction.dataValues.status,
         createdAt: moment(transaction.createdAt).format("DD-MM-YYYY HH:mm:ss"),
       };
     });

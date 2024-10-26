@@ -209,6 +209,7 @@ export const syncPendingTransaction = async () => {
             validateStatus: (status) => true,
           }
         );
+        console.log(resStep2);
         if (resStep2.status && resStep2.status == 200) {
           const index = error.indexOf("STEP2");
           error.splice(index, 1);
@@ -349,12 +350,10 @@ export const CheckBinCapacity = async (req, res) => {
 
     // Jika tidak ada tempat sampah yang ditemukan untuk type_waste yang diberikan
     if (!bins || bins.length === 0) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "No bins found for the given waste type",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "No bins found for the given waste type",
+      });
     }
 
     // Menyaring tempat sampah yang memiliki kapasitas cukup untuk neto
@@ -365,12 +364,10 @@ export const CheckBinCapacity = async (req, res) => {
 
     // Jika tidak ada tempat sampah yang memenuhi kapasitas
     if (eligibleBins.length === 0) {
-      return res
-        .status(200)
-        .json({
-          success: false,
-          message: "No bins with enough capacity found",
-        });
+      return res.status(200).json({
+        success: false,
+        message: "No bins with enough capacity found",
+      });
     }
 
     // Mengurutkan tempat sampah berdasarkan kapasitas yang paling kosong terlebih dahulu

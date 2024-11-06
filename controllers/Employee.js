@@ -399,7 +399,12 @@ export const checkTransaksi = async (req, res) => {
   const tr = await transaction.findOne({
     where: {
       idContainer: idContainer,
-      status: "Waiting Dispose To Step 2",
+      [Op.or]: [
+        {
+          status: "Waiting Dispose To Step 2",
+        },
+        { status: { [Op.like]: "%PENDING%" } },
+      ],
     },
   });
   return tr

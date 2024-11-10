@@ -672,3 +672,66 @@ export const getIdmachine = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+export const syncEmployeePIDSGAPI = async (req,res)=>{
+    return res.json(await syncEmployeePIDSG());
+}
+
+export const syncEmployeePIDSG = async ()=>{
+    try
+    {
+        const apiRes = await syncApiClient.get(
+            `http://${process.env.PIDSG}/api/pid/employee-sync?f1=${process.env.STATION}`);
+        const syncEmp = apiRes.data.result[0];
+        for (let i=0;i<syncEmp.length;i++)
+        {
+            const empRes = await db.query("Select badgeId,username from employee where badgeId=?",{type:QueryTypes.SELECT,replacements:[syncEmp[i].badgeno]});
+            if (empRes.length < 1)
+            {
+                await db.query("Insert Into employee(username,active,badgeId) values(?,1,?)",
+                {
+                    type:QueryTypes.INSERT,
+                    replacements: [syncEmp[i].employeename,syncEmp[i].badgeno]
+                });
+            }
+            else
+            {
+                await db.query("Update employee set username=? where badgeId=?",{
+                    type: QueryTypes.UPDATE,
+                    replacements: [syncEmp[i].employeename,syncEmp[i].badgeno]
+                })
+            }
+        }
+        return syncEmp;
+    }
+    catch (er)
+    {
+        console.log(er);
+        return  er.message || er;
+    }
+}
+
+/*router.get('/employee-sync',async (req,res)=>{
+  try {
+    const pool = await poolPromise;
+    let result = await pool.request().input('f1',`${req.query.f1}%`).query(`
+    select s.name,e.employeename,e.badgeno,sum(case when event='IN' then 1 else 0 end) as [IN],sum(case when event='OUT' then 1 else 0 end) as [OUT] from pid_mwastestationaccess ac inner join pid_mwastestation s on ac.pid_mwastestation_key=s.pid_mwastestation_key inner join pid_memployee e on e.pid_memployee_key=ac.pid_memployee_key 
+    where s.name like @f1
+    group by s.name,e.employeename,e.badgeno
+    order by s.name,e.badgeno
+    `);
+    res.status(200).json({
+      success: true,
+      result: result.recordsets
+    });
+
+    // res.json(req.params.sp)
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      response: err.message
+    });
+  }
+});*/

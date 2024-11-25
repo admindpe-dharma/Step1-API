@@ -194,26 +194,32 @@ export const syncPendingTransaction = async () => {
         pendingData[i].idscraplog != "Fail" &&
         pendingData[i].idscraplog != ""
       ) {
-        const resStep2 = await syncApiClient.post(
-          `http://${pendingData[i].hostname}/Step1`,
-          {
-            idscraplog: pendingData[i].idscraplog,
-            waste: pendingData[i].wasteName,
-            container: pendingData[i].containerName,
-            badgeId: pendingData[i].badgeId,
-            toBin: pendingData[i].bin,
-          },
-          {
-            timeout: 2000,
-            withCredentials: false,
-            validateStatus: (status) => true,
+        try
+        {
+          const resStep2 = await syncApiClient.post(
+            `http://${pendingData[i].hostname}/Step1`,
+            {
+              idscraplog: pendingData[i].idscraplog,
+              waste: pendingData[i].wasteName,
+              container: pendingData[i].containerName,
+              badgeId: pendingData[i].badgeId,
+              toBin: pendingData[i].bin,
+            },
+            {
+              timeout: 2000,
+              withCredentials: false,
+              validateStatus: (status) => true,
+            }
+          );
+          if (resStep2.status && resStep2.status == 200) {
+            const index = error.indexOf("STEP2");
+            error.splice(index, 1);
           }
-        );
-        if (resStep2.status && resStep2.status == 200) {
-          const index = error.indexOf("STEP2");
-          error.splice(index, 1);
         }
-        continue;
+        catch (er)
+        {
+          console.log(er);
+        }
       }
     }
     const newStatus =
@@ -427,7 +433,13 @@ export const SaveTransaksi = async (req, res) => {
   const tr = await transaction.findOne({
     where: {
       idContainer: payload.idContainer,
-      status: "Waiting Dispose To Step 2",
+      [Op.or] : [
+        {
+      status: "Waiting Dispose To Step 2"},
+      {
+        status: {[Op.like] : '%PENDING%'}
+      }
+      ]
     },
   });
   if (tr)

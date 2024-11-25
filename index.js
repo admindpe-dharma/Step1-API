@@ -5,7 +5,7 @@ import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
 import bodyParser from "body-parser";
-import { syncPendingTransaction, UpdateStatus } from "./controllers/Employee.js";
+import { syncEmployeePIDSG, syncPendingTransaction, UpdateStatus } from "./controllers/Employee.js";
 import { config } from "dotenv";
 import path from "path";
 config('.env');
@@ -47,6 +47,11 @@ server.listen(port, () => {
 const syncWork = async ()=>{
   await syncPendingTransaction();
   setImmediate(syncWork);
+};
+const syncEmp = async ()=>{
+  await syncEmployeePIDSG();
+  console.log('Sync Employee Data');
+  setTimeout(syncEmp,10 * 10 * 1000);
 };
 syncWork();
 export {io};

@@ -44,14 +44,4 @@ app.use(ScannerRoute);
 server.listen(port, () => {
   console.log(`Server up and running on port ${port}`);
 });
-const syncWork = async ()=>{
-  await syncPendingTransaction();
-  setImmediate(syncWork);
-};
-const syncEmp = async ()=>{
-  await syncEmployeePIDSG();
-  console.log('Sync Employee Data');
-  setTimeout(syncEmp,10 * 10 * 1000);
-};
-syncWork();
 export {io};

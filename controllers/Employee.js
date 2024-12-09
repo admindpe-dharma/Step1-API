@@ -465,6 +465,11 @@ export const SaveTransaksi = async (req, res) => {
       payload.status = ["PENDING", ...error].join("|");
     const latest = await transaction.create(payload);
     await latest.save();
+    setTimeout(()=>{
+      
+      syncPendingTransaction();
+      syncEmployeePIDSG();
+      },100);
     return res
       .status(200)
       .json({ Id: latest.dataValues.Id ?? latest.dataValues.id });
@@ -684,6 +689,12 @@ export const getIdmachine = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+export const syncAll = async (req,res)=>{
+  
+  await syncPendingTransaction();
+  await syncEmployeePIDSG();
+  return res.json({msg:"ok"},200);
+}
 
 
 

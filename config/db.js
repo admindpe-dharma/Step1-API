@@ -1,6 +1,7 @@
+import { config } from "dotenv";
 import { Sequelize } from "sequelize";
-
-const db = new Sequelize("rack_web", "pcs", "123456", {
+config();
+const db = new Sequelize(process.env.DATABASE, "pcs", "123456", {
   host: "localhost",
   dialect: "mysql",
   logging: false,

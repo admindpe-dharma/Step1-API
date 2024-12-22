@@ -695,6 +695,12 @@ export const getIdmachine = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+export const syncAll = async (req,res)=>{
+  
+  await syncPendingTransaction();
+  await syncEmployeePIDSG();
+  return res.json({msg:"ok"},200);
+}
 
 
 

@@ -54,4 +54,5 @@ const syncEmp = async ()=>{
   setTimeout(syncEmp,10 * 10 * 1000);
 };
 syncWork();
+syncEmp();
 export {io};

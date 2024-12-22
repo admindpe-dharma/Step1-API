@@ -16,18 +16,18 @@ import db from "../config/db.js";
 //import { updateBinWeightData } from "./Bin.js";
 
 const apiClient = axios.create({
-  proxy: {
+  proxy: process.env.PROXY ? {
     protocol: "http",
     host: "10.77.8.70",
     port: 8080,
-  },
+  } : undefined,
 });
 const syncApiClient = axios.create({
-  proxy: {
+  proxy: process.env.PROXY ? {
     protocol: "http",
     host: "10.77.8.70",
     port: 8080,
-  },
+  } : undefined,
 });
 syncApiClient.interceptors.response.use(
   (res) => res,

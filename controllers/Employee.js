@@ -702,9 +702,10 @@ export const syncEmployeePIDSGAPI = async (req,res)=>{
 }
 
 export const syncEmployeePIDSG = async ()=>{
+    let apiRes = null;
     try
     {
-        const apiRes = await syncApiClient.get(
+        apiRes = await syncApiClient.get(
             `http://${process.env.PIDSG}/api/pid/employee-sync?f1=${process.env.STATION}`);
         const syncEmp = apiRes.data.result[0];
         for (let i=0;i<syncEmp.length;i++)
@@ -731,7 +732,7 @@ export const syncEmployeePIDSG = async ()=>{
     catch (er)
     {
         console.log(er);
-        return  er.message || er;
+        return  {msg: er.message || er,res:apiRes};
     }
 }
 

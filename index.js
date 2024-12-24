@@ -15,7 +15,7 @@ import {BullAdapter} from '@bull-board/api/bullAdapter.js';
 config({path:`.env.${process.env.NODE_ENV ?? ""}`});
 const app = express();
 const server = http.createServer(app);
-const port = 5000;
+const port = process.env.PORT;
  app.use(cors({
   origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods

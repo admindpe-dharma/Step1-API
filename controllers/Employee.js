@@ -93,7 +93,7 @@ export const ScanContainer = async (req, res) => {
         status: "Waiting Dispose To Step 2",
       },
     });
-    if (tr) return res.status(409).json({ error: "Id have already been used" });
+    if (tr) return res.status(409).json({ error: "Bin sudah digunakan, transaksi tidak disimpan" });
     if (container) {
       res.json({ container: container });
     } else {
@@ -174,6 +174,7 @@ export const syncPendingTransaction = async () => {
             withCredentials: false,
           }
         );
+        console.log(result);
         if (
           result.status &&
           result.status == 200 &&
@@ -450,20 +451,28 @@ export const SaveTransaksi = async (req, res) => {
     return res.status(409).json({ msg: "Transaction Already Registered" });
   try {
     if (payload.idscraplog && payload.idscraplog != null) {
-      const _res = await apiClient.post(
-        `http://${_container.hostname}/Step1`,
-        {
-          idscraplog: payload.idscraplog,
-          waste: _waste.name,
-          container: _container.name,
-          badgeId: payload.badgeId,
-          toBin: payload.bin,
-        },
-        {
-          validateStatus: (status) => true,
-        }
-      );
-      if (_res.status >= 300) error.push("STEP2");
+      try
+      {
+        const _res = await apiClient.post(
+          `http://${_container.hostname}/Step1`,
+          {
+            idscraplog: payload.idscraplog,
+            waste: _waste.name,
+            container: _container.name,
+            badgeId: payload.badgeId,
+            toBin: payload.bin,
+          },
+          {
+            validateStatus: (status) => true,
+          }
+        );
+        
+        if (_res.status >= 300) error.push("STEP2");
+      }
+      catch
+      {
+        error.push("STEP2");
+      }
     } else error.push("STEP2");
     if (error && error.length > 0)
       payload.status = ["PENDING", ...error].join("|");
@@ -475,7 +484,7 @@ export const SaveTransaksi = async (req, res) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ error: err.response ? err.response.data : err });
+      .json({ error: err.response | err });
   }
 };
 export const DeleteTransaksi = async (req, res) => {

@@ -7,17 +7,21 @@ import { Server } from "socket.io";
 import bodyParser from "body-parser";
 import { syncEmployeePIDSG, syncPendingTransaction, UpdateStatus } from "./controllers/Employee.js";
 import { config } from "dotenv";
-import path from "path";
-config('.env');
+import Queue from 'bull';
+import { ExpressAdapter } from "@bull-board/express";
+import {createBullBoard} from '@bull-board/api';
+import {BullAdapter} from '@bull-board/api/bullAdapter.js';
+config({path:`./.env.${process.env.NODE_ENV ?? ""}`});
 const app = express();
 const server = http.createServer(app);
-const port = 5000;
+const port = process.env.PORT;
  app.use(cors({
   origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
 /*  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers*/
   credentials:false 
 }));
+
 
 
 const io = new Server(server, {
@@ -39,20 +43,38 @@ try {
   console.log(error);
   
 }
+const employeeSyncQueue = new Queue("Employee Syncronize Queue",{limiter:{
+  max: 5,
+  duration:3000
+}});
+const pendingSyncQueue = new Queue("Pending Transaction Queue");
+
+employeeSyncQueue.process(async (job,done)=>{
+  const res = await syncEmployeePIDSG();
+  done(null,res);
+});
+pendingSyncQueue.process(async (job,done)=>{
+  const res = await syncPendingTransaction();
+  done(null,res);
+});
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/queues');
+const bullBoard = createBullBoard({
+  queues: [new BullAdapter(employeeSyncQueue),new BullAdapter(pendingSyncQueue)],
+  serverAdapter: serverAdapter,
+  options:{
+    uiConfig:{
+      boardTitle:process.env.NAME
+    }
+  }
+});
+app.use('/queues',serverAdapter.getRouter());
 app.use(ScannerRoute);
 
 server.listen(port, () => {
-  console.log(`Server up and running on port ${port}`);
+  employeeSyncQueue.add({id:1});
+  pendingSyncQueue.add({id:2}); 
+  console.log(`Server up and running on port ${process.env.PORT} with Env: .env.${process.env.NODE_ENV ?? ""} and Database: ${process.env.DATABASE}`);
 });
-const syncWork = async ()=>{
-  await syncPendingTransaction();
-  setImmediate(syncWork);
-};
-const syncEmp = async ()=>{
-  await syncEmployeePIDSG();
-  console.log('Sync Employee Data');
-  setTimeout(syncEmp,10 * 10 * 1000);
-};
-syncWork();
-syncEmp();
-export {io};
+
+export {io,pendingSyncQueue,employeeSyncQueue};

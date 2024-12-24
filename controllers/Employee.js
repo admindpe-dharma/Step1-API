@@ -7,7 +7,7 @@ import moment from "moment";
 import employee from "../models/EmployeeModel.js";
 import container from "../models/ContainerModel.js";
 import bin from "../models/BinModel.js";
-import { io } from "../index.js";
+import { employeeSyncQueue, io, pendingSyncQueue } from "../index.js";
 import { response } from "express";
 import axios from "axios";
 import { Op, QueryTypes } from "sequelize";
@@ -16,20 +16,18 @@ import db from "../config/db.js";
 //import { updateBinWeightData } from "./Bin.js";
 
 const apiClient = axios.create({
-  proxy: {
+  proxy: process.env.PROXY ? {
     protocol: "http",
     host: "10.77.8.70",
     port: 8080,
-  },
-  timeout:1500  
+  } : undefined,
 });
 const syncApiClient = axios.create({
-  proxy: {
+  proxy: process.env.PROXY ? {
     protocol: "http",
     host: "10.77.8.70",
     port: 8080,
-  },
-  timeout: 3000,
+  } : undefined,
 });
 syncApiClient.interceptors.response.use(
   (res) => res,
@@ -38,6 +36,7 @@ syncApiClient.interceptors.response.use(
 export const ScanBadgeid = async (req, res) => {
   const { badgeId } = req.body;
   try {
+    employeeSyncQueue.add({id:1});
     const user = await Users.findOne({
       attributes: ["badgeId", "username"],
       where: { badgeId },
@@ -189,7 +188,8 @@ export const syncPendingTransaction = async () => {
             pendingData[i].idscraplog = result.data.result;
           }
         }
-        continue;
+        else
+          continue;
       } else if (
         errorLoop[j] == "STEP2" &&
         !error.includes("PIDSG") &&
@@ -240,6 +240,7 @@ export const syncPendingTransaction = async () => {
       }
     );
   }
+  return pendingData;
 };
 export const syncTransaction = async (req, res) => {
   try {
@@ -423,6 +424,7 @@ export const checkTransaksi = async (req, res) => {
 export const SaveTransaksi = async (req, res) => {
   const { payload, error } = req.body;
   //payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
+  pendingSyncQueue.add({id:2});
   const _waste = await Waste.findOne({
     where: {
       id: payload.IdWaste,
@@ -709,9 +711,10 @@ export const syncEmployeePIDSGAPI = async (req,res)=>{
 }
 
 export const syncEmployeePIDSG = async ()=>{
+    let apiRes = null;
     try
     {
-        const apiRes = await syncApiClient.get(
+        apiRes = await syncApiClient.get(
             `http://${process.env.PIDSG}/api/pid/employee-sync?f1=${process.env.STATION}`);
         const syncEmp = apiRes.data.result[0];
         for (let i=0;i<syncEmp.length;i++)
@@ -738,7 +741,7 @@ export const syncEmployeePIDSG = async ()=>{
     catch (er)
     {
         console.log(er);
-        return  er.message || er;
+        return  {msg: er.message || er,res:apiRes};
     }
 }
 

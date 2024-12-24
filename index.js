@@ -12,7 +12,7 @@ import { ExpressAdapter } from "@bull-board/express";
 import {createBullBoard} from '@bull-board/api';
 import {BullAdapter} from '@bull-board/api/bullAdapter.js';
 
-config('.env');
+config({path:`.env.${process.env.NODE_ENV ?? ""}`});
 const app = express();
 const server = http.createServer(app);
 const port = 5000;
@@ -75,7 +75,7 @@ app.use(ScannerRoute);
 server.listen(port, () => {
   employeeSyncQueue.add({id:1});
   pendingSyncQueue.add({id:2}); 
-  console.log(`Server up and running on port ${port}`);
+  console.log(`Server up and running on port ${port} with Env: .env.${process.env.NODE_ENV ?? ""}`);
 });
 
 export {io,pendingSyncQueue,employeeSyncQueue};

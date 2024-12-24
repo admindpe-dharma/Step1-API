@@ -11,7 +11,7 @@ import Queue from 'bull';
 import { ExpressAdapter } from "@bull-board/express";
 import {createBullBoard} from '@bull-board/api';
 import {BullAdapter} from '@bull-board/api/bullAdapter.js';
-config({path:`./.env.${process.env.NODE_ENV ?? ""}`});
+config({path:`.env.${process.env.NODE_ENV ?? ""}`});
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT;

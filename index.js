@@ -1,17 +1,17 @@
+import './env.js';
 import express from "express";
 import ScannerRoute from "./routes/ScannerRoute.js";
-import db from "./config/db.js";
 import cors from  "cors";
 import http from 'http';
 import { Server } from "socket.io";
 import bodyParser from "body-parser";
 import { syncEmployeePIDSG, syncPendingTransaction, UpdateStatus } from "./controllers/Employee.js";
-import { config } from "dotenv";
 import Queue from 'bull';
 import { ExpressAdapter } from "@bull-board/express";
 import {createBullBoard} from '@bull-board/api';
 import {BullAdapter} from '@bull-board/api/bullAdapter.js';
-config({path:`.env.${process.env.NODE_ENV ?? ""}`});
+import db from "./config/db.js";
+
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT;

@@ -422,7 +422,8 @@ export const checkTransaksi = async (req, res) => {
     : res.status(200).json({ msg: "OK" });
 };
 export const SaveTransaksi = async (req, res) => {
-  const { payload, error } = req.body;
+  const { payload } = req.body;
+  const error = [];
   //payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
   pendingSyncQueue.add({id:2});
   const _waste = await Waste.findOne({
@@ -450,7 +451,34 @@ export const SaveTransaksi = async (req, res) => {
   if (tr)
     return res.status(409).json({ msg: "Transaction Already Registered" });
   try {
-    if (payload.idscraplog && payload.idscraplog != null) {
+    
+    let stationname = _container.name.split("-").slice(0, 3).join("-");
+    try
+    {
+    const response = await apiClient.post(
+      `http://${process.env.PIDSG}/api/pid/step1`,
+      {
+        badgeno: payload.badgeId,
+        logindate: "",
+        stationname: stationname,
+        frombinname: payload.bin,
+        tobinname: _container.name,
+        weight: "0",
+        activity: "Waiting Dispose To Step 2",
+      }
+    );
+    if (response.status && (response.status != 200 || (response.data && response.data.status && response.data.status == "Fail" ))) 
+    {
+      error.push('PIDSG');
+    }
+    else
+      payload.idscraplog = response.data.result;
+    }
+    catch (er)
+    {
+      error.push('PIDSG');
+    } 
+    if (error.length == 0) {
       try
       {
         const _res = await apiClient.post(
@@ -476,6 +504,8 @@ export const SaveTransaksi = async (req, res) => {
     } else error.push("STEP2");
     if (error && error.length > 0)
       payload.status = ["PENDING", ...error].join("|");
+    else
+      payload.status = 'Waiting Dispose To Step 2';
     const latest = await transaction.create(payload);
     await latest.save();
     return res

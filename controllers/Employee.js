@@ -21,6 +21,7 @@ const apiClient = axios.create({
     host: "10.77.8.70",
     port: 8080,
   } : undefined,
+  timeout: 1500,
 });
 const syncApiClient = axios.create({
   proxy: process.env.PROXY ? {
@@ -28,6 +29,7 @@ const syncApiClient = axios.create({
     host: "10.77.8.70",
     port: 8080,
   } : undefined,
+  timeout: 1500,
 });
 syncApiClient.interceptors.response.use(
   (res) => res,

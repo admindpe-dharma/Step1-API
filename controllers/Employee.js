@@ -89,6 +89,8 @@ export const ScanContainer = async (req, res) => {
       ],
       where: { name: containerId },
     });
+    if (container) {
+      
     const tr = await transaction.findOne({
       where: {
         idContainer: container.containerId,
@@ -96,7 +98,6 @@ export const ScanContainer = async (req, res) => {
       },
     });
     if (tr) return res.status(409).json({ error: "Bin sudah digunakan, transaksi tidak disimpan" });
-    if (container) {
       res.json({ container: container });
     } else {
       res.json({ error: "Container ID not found" });

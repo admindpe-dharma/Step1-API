@@ -72,8 +72,8 @@ try {
 app.use(ScannerRoute);
 
 server.listen(port, () => {
-  employeeSyncQueue.add({id:1});
-  pendingSyncQueue.add({id:2}); 
+  // employeeSyncQueue.add({id:1});
+  // pendingSyncQueue.add({id:2}); 
   console.log(`Server up and running on port ${process.env.PORT} with Env: .env.${process.env.NODE_ENV ?? ""} and Database: ${process.env.DATABASE}`);
 });
 

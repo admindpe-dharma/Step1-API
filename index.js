@@ -43,32 +43,32 @@ try {
   console.log(error);
   
 }
-const employeeSyncQueue = new Queue("Employee Syncronize Queue",{limiter:{
-  max: 5,
-  duration:3000
-}});
-const pendingSyncQueue = new Queue("Pending Transaction Queue");
+// const employeeSyncQueue = new Queue("Employee Syncronize Queue",{limiter:{
+//   max: 5,
+//   duration:3000
+// }});
+// const pendingSyncQueue = new Queue("Pending Transaction Queue");
 
-employeeSyncQueue.process(async (job,done)=>{
-  const res = await syncEmployeePIDSG();
-  done(null,res);
-});
-pendingSyncQueue.process(async (job,done)=>{
-  const res = await syncPendingTransaction();
-  done(null,res);
-});
-const serverAdapter = new ExpressAdapter();
-serverAdapter.setBasePath('/queues');
-const bullBoard = createBullBoard({
-  queues: [new BullAdapter(employeeSyncQueue),new BullAdapter(pendingSyncQueue)],
-  serverAdapter: serverAdapter,
-  options:{
-    uiConfig:{
-      boardTitle:process.env.NAME
-    }
-  }
-});
-app.use('/queues',serverAdapter.getRouter());
+// employeeSyncQueue.process(async (job,done)=>{
+//   const res = await syncEmployeePIDSG();
+//   done(null,res);
+// });
+// pendingSyncQueue.process(async (job,done)=>{
+//   const res = await syncPendingTransaction();
+//   done(null,res);
+// });
+// const serverAdapter = new ExpressAdapter();
+// serverAdapter.setBasePath('/queues');
+// const bullBoard = createBullBoard({
+//   queues: [new BullAdapter(employeeSyncQueue),new BullAdapter(pendingSyncQueue)],
+//   serverAdapter: serverAdapter,
+//   options:{
+//     uiConfig:{
+//       boardTitle:process.env.NAME
+//     }
+//   }
+// });
+//app.use('/queues',serverAdapter.getRouter());
 app.use(ScannerRoute);
 
 server.listen(port, () => {
@@ -77,4 +77,7 @@ server.listen(port, () => {
   console.log(`Server up and running on port ${process.env.PORT} with Env: .env.${process.env.NODE_ENV ?? ""} and Database: ${process.env.DATABASE}`);
 });
 
-export {io,pendingSyncQueue,employeeSyncQueue};
+export {io
+  // pendingSyncQueue
+  // ,employeeSyncQueue
+};

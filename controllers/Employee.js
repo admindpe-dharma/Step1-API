@@ -7,7 +7,7 @@ import moment from "moment";
 import employee from "../models/EmployeeModel.js";
 import container from "../models/ContainerModel.js";
 import bin from "../models/BinModel.js";
-import { employeeSyncQueue, io, pendingSyncQueue } from "../index.js";
+//import { employeeSyncQueue, io, pendingSyncQueue } from "../index.js";
 import { response } from "express";
 import axios from "axios";
 import { Op, QueryTypes } from "sequelize";
@@ -38,7 +38,7 @@ syncApiClient.interceptors.response.use(
 export const ScanBadgeid = async (req, res) => {
   const { badgeId } = req.body;
   try {
-    employeeSyncQueue.add({id:1});
+//    employeeSyncQueue.add({id:1});
     const user = await Users.findOne({
       attributes: ["badgeId", "username"],
       where: { badgeId },
@@ -428,7 +428,7 @@ export const SaveTransaksi = async (req, res) => {
   const { payload } = req.body;
   const error = [];
   //payload.recordDate = moment().format("YYYY-MM-DD HH:mm:ss");
-  pendingSyncQueue.add({id:2});
+//  pendingSyncQueue.add({id:2});
   const _waste = await Waste.findOne({
     where: {
       id: payload.IdWaste,
